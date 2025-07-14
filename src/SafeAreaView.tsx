@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { requireNativeComponent } from 'react-native';
 import type {
   Edge,
   EdgeMode,
@@ -6,8 +7,9 @@ import type {
   NativeSafeAreaViewInstance,
   NativeSafeAreaViewProps,
 } from './SafeArea.types';
-import NativeSafeAreaView from './specs/NativeSafeAreaView';
 import { useMemo } from 'react';
+
+const NativeSafeAreaView = requireNativeComponent<NativeSafeAreaViewProps>('RNCSafeAreaView');
 
 const defaultEdges: Record<Edge, EdgeMode> = {
   top: 'additive',

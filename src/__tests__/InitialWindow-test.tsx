@@ -24,24 +24,18 @@ describe('InitialWindow', () => {
           width: 100,
         },
       };
-      const TurboModuleRegistry = require('react-native/Libraries/TurboModule/TurboModuleRegistry');
-      TurboModuleRegistry.get = jest.fn((name) => {
-        if (name === 'RNCSafeAreaContext') {
+      const { NativeModules } = require('react-native');
+      NativeModules.RNCSafeAreaContext = {
+        getConstants() {
           return {
-            getConstants() {
-              return {
-                initialWindowMetrics: testMetrics,
-              };
-            },
+            initialWindowMetrics: testMetrics,
           };
-        }
-        return null;
-      });
+        },
+      };
 
       expect(require('../InitialWindow').initialWindowMetrics).toBe(
         testMetrics,
       );
-      expect(TurboModuleRegistry.get).toBeCalledWith('RNCSafeAreaContext');
     });
   });
 });

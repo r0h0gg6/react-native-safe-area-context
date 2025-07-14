@@ -1,7 +1,5 @@
 require 'json'
 
-fabric_enabled = ENV['RCT_NEW_ARCH_ENABLED'] == '1'
-
 package = JSON.parse(File.read(File.join(__dir__, 'package.json')))
 
 Pod::Spec.new do |s|
@@ -22,20 +20,4 @@ Pod::Spec.new do |s|
   s.exclude_files = "ios/Fabric"
 
   s.dependency "React-Core"
-
-  if fabric_enabled
-    install_modules_dependencies(s)
-
-    s.subspec "common" do |ss|
-      ss.source_files         = "common/cpp/**/*.{cpp,h}"
-      ss.header_dir           = "react/renderer/components/safeareacontext"
-      ss.pod_target_xcconfig  = { "HEADER_SEARCH_PATHS" => "\"$(PODS_TARGET_SRCROOT)/common/cpp\"" }
-    end
-
-    s.subspec "fabric" do |ss|
-      ss.dependency "react-native-safe-area-context/common"
-      ss.source_files         = "ios/Fabric/**/*.{h,m,mm}"
-      ss.pod_target_xcconfig  = { "HEADER_SEARCH_PATHS" => "\"$(PODS_TARGET_SRCROOT)/common/cpp\"" }
-    end
-  end
 end

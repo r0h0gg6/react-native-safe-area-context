@@ -1,6 +1,5 @@
 import type * as React from 'react';
 import type { NativeSyntheticEvent, ViewProps } from 'react-native';
-import NativeSafeAreaView from './specs/NativeSafeAreaView';
 
 export type Edge = 'top' | 'right' | 'bottom' | 'left';
 export type EdgeMode = 'off' | 'additive' | 'maximum';
@@ -42,6 +41,4 @@ export interface NativeSafeAreaViewProps extends ViewProps {
   edges?: Edges;
 }
 
-export type NativeSafeAreaViewInstance = InstanceType<
-  typeof NativeSafeAreaView
->;
+export type NativeSafeAreaViewInstance = React.Component<NativeSafeAreaViewProps>;
