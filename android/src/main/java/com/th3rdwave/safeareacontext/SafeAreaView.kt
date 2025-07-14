@@ -4,8 +4,6 @@ import android.content.Context
 import android.util.Log
 import android.view.View
 import android.view.ViewTreeObserver
-import com.facebook.react.bridge.Arguments
-import com.facebook.react.uimanager.StateWrapper
 import com.facebook.react.uimanager.UIManagerModule
 import com.facebook.react.views.view.ReactViewGroup
 import java.util.concurrent.locks.ReentrantLock
@@ -19,15 +17,6 @@ class SafeAreaView(context: Context?) :
   private var mInsets: EdgeInsets? = null
   private var mEdges: SafeAreaViewEdges? = null
   private var mProviderView: View? = null
-  private var mStateWrapper: StateWrapper? = null
-
-  fun getStateWrapper(): StateWrapper? {
-    return mStateWrapper
-  }
-
-  fun setStateWrapper(stateWrapper: StateWrapper?) {
-    mStateWrapper = stateWrapper
-  }
 
   private fun updateInsets() {
     val insets = mInsets
@@ -39,27 +28,20 @@ class SafeAreaView(context: Context?) :
                   SafeAreaViewEdgeModes.ADDITIVE,
                   SafeAreaViewEdgeModes.ADDITIVE,
                   SafeAreaViewEdgeModes.ADDITIVE)
-      val stateWrapper = getStateWrapper()
-      if (stateWrapper != null) {
-        val map = Arguments.createMap()
-        map.putMap("insets", edgeInsetsToJsMap(insets))
-        stateWrapper.updateState(map)
-      } else {
-        val localData = SafeAreaViewLocalData(insets = insets, mode = mMode, edges = edges)
-        val reactContext = getReactContext(this)
-        val uiManager = reactContext.getNativeModule(UIManagerModule::class.java)
-        if (uiManager != null) {
-          uiManager.setViewLocalData(id, localData)
-          // Sadly there doesn't seem to be a way to properly dirty a yoga node from java, so if we
-          // are in
-          // the middle of a layout, we need to recompute it. There is also no way to know whether
-          // we
-          // are in the middle of a layout so always do it.
-          reactContext.runOnNativeModulesQueueThread {
-            uiManager.uiImplementation.dispatchViewUpdates(-1)
-          }
-          waitForReactLayout()
+      val localData = SafeAreaViewLocalData(insets = insets, mode = mMode, edges = edges)
+      val reactContext = UIManagerHelperCompat.getReactContext(this)
+      val uiManager = reactContext.getNativeModule(UIManagerModule::class.java)
+      if (uiManager != null) {
+        uiManager.setViewLocalData(id, localData)
+        // Sadly there doesn't seem to be a way to properly dirty a yoga node from java, so if we
+        // are in
+        // the middle of a layout, we need to recompute it. There is also no way to know whether
+        // we
+        // are in the middle of a layout so always do it.
+        reactContext.runOnNativeModulesQueueThread {
+          uiManager.uiImplementation.dispatchViewUpdates(-1)
         }
+        waitForReactLayout()
       }
     }
   }
@@ -75,7 +57,7 @@ class SafeAreaView(context: Context?) :
     val condition = lock.newCondition()
     val startTime = System.nanoTime()
     var waitTime = 0L
-    getReactContext(this).runOnNativeModulesQueueThread {
+    UIManagerHelperCompat.getReactContext(this).runOnNativeModulesQueueThread {
       lock.withLock {
         if (!done) {
           done = true

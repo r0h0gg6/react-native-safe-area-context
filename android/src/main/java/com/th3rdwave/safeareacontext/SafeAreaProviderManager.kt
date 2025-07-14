@@ -37,5 +37,7 @@ private fun handleOnInsetsChange(view: SafeAreaProvider, insets: EdgeInsets, fra
   val reactContext = view.context as ReactContext
   val reactTag = view.id
   UIManagerHelper.getEventDispatcherForReactTag(reactContext, reactTag)
-      ?.dispatchEvent(InsetsChangeEvent(getSurfaceId(reactContext), reactTag, insets, frame))
+      ?.dispatchEvent(
+          InsetsChangeEvent(
+              UIManagerHelperCompat.getSurfaceId(reactContext), reactTag, insets, frame))
 }
